@@ -1,0 +1,6 @@
+node_modules
+.idea
+logs
+public/bundle.js
+npm-debug.log
+rethinkdb_data

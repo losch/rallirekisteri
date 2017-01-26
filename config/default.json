@@ -1,0 +1,10 @@
+{
+  "logfile": "./logs/rallirekisteri.log",
+  "port": 8080,
+  "rethinkdb": {
+    "host": "localhost",
+    "port": 28015,
+    "authKey": "",
+    "db": "rallirekisteri"
+  }
+}
