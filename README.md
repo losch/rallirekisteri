@@ -5,6 +5,9 @@ A simple web application for storing best times in rally games.
 
 ![Screenshot](./screenshot.png?raw=true)
 
+See also the IRC bot [Rallibotti](https://github.com/joonasjussila/rallibotti)
+that stores times into Rallirekisteri from IRC channels.
+
 Requirements
 ------------
 
@@ -17,13 +20,13 @@ Installation
 ------------
 
 1. Install dependencies ```yarn```
-2. Build frontend code ```npm run build```
+2. Build frontend code ```yarn run build```
 3. Start RethinkDB ```rethinkdb --http-port 8081``` 
 4. Open RethinkDB's web UI in http://localhost:8081
 5. Create new database called `rallirekisteri`
 6. Create new table called `rounds`
 7. Create new secondary index to `rounds` table called `date`
-8. Start application ```npm start```
+8. Start application ```yarn start```
 
 Application starts at http://localhost:8080
 
@@ -37,8 +40,7 @@ Create config/production.json
 Then start application with:
 
 ```
-export NODE_ENV=production
-npm start
+NODE_ENV=production yarn start
 ```
 
 Development
@@ -46,7 +48,7 @@ Development
 
 Start webpack's hot loading server:
 
-```npm run dev```
+```yarn run dev```
 
 Then connect to http://localhost:3000 and do some coding.
 

@@ -1,10 +1,9 @@
 'use strict';
 
-let _ = require('lodash-fp');
-
-var r = require('rethinkdb');
-
-var assert = require('assert');
+const _ = require('lodash-fp');
+const r = require('rethinkdb');
+const assert = require('assert');
+const util = require('util');
 
 let conn;
 
@@ -33,7 +32,7 @@ function init(rethinkConfig, log) {
 
   return r.connect(rethinkConfig)
     .then((_conn) => {
-      logger.info('Connected to RethinkDB at ' + rethinkConfig);
+      logger.info('Connected to RethinkDB at ' + util.inspect(rethinkConfig));
       conn = _conn;
     })
     .error((err) => {
