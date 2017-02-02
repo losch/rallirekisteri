@@ -2,6 +2,7 @@
 
 const _ = require('lodash-fp');
 const r = require('rethinkdb');
+const moment = require('moment');
 const assert = require('assert');
 const util = require('util');
 
@@ -141,6 +142,44 @@ function getRounds(date) {
   return rounds.run(conn);
 }
 
+function timeComparator(timeA, timeB) {
+  const format = 'mm:ss.SSS';
+
+  let t0 = moment(timeA.time, format);
+  let t1 = moment(timeB.time, format);
+
+  let t0Valid = t0.isValid();
+  let t1Valid = t1.isValid();
+
+  if (!t0Valid && !t1Valid) {
+    return 0;
+  }
+  else if (!t0Valid && t1Valid) {
+    return 1;
+  }
+  else if (t0Valid && !t1Valid) {
+    return -1;
+  }
+  else {
+    return t0.isAfter(t1);
+  }
+}
+
+function scoreRound(round) {
+  if (!round.times) return [];
+
+  let sortedTimes = round.times.slice();
+  sortedTimes.sort(timeComparator);
+  sortedTimes.reverse();
+
+  return sortedTimes.reduce((entries, entry) => {
+      return entries.concat(
+        [{ name: entry.name, score: entries.length + 1, date: round.date }]
+      )
+    },
+    []);
+}
+
 /**
  * Returns scores for drivers according to positioning
  * @param {string?} startDate - Start date
@@ -148,29 +187,16 @@ function getRounds(date) {
  * @returns {Promise}
  */
 function getScores(startDate, endDate) {
-  let scoreRound = (round) => {
-    let times = round('times').default([]).orderBy(r.desc('time'));
-
-    return times.fold([], (entries, entry) => {
-      let score = entries.count();
-
-      return entries.append(
-        { name: entry('name'), score: score.add(1), date: round('date') }
-      );
-    });
-  };
-
   let rounds = r.table('rounds');
 
   if (startDate && endDate) {
-    rounds =
-      rounds.between(startDate, endDate,
-                     {index: 'date', rightBound: 'closed'});
+    rounds = rounds.between(startDate, endDate,
+                            {index: 'date', rightBound: 'closed'});
   }
 
-  return rounds.map(scoreRound)
-               .run(conn)
-               .then((cursor) => cursor.toArray());
+  return rounds.run(conn)
+               .then((cursor) => cursor.toArray())
+               .map(scoreRound);
 }
 
 /**
